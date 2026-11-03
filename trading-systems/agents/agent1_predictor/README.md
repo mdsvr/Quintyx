@@ -73,6 +73,18 @@ FYERS_ACCESS_TOKEN=                         # Auto-filled by fyers_mcp_auth.py
 
 ---
 
+## 🧪 Installing & Running Tests
+
+The tests need no API keys, no network and no `.env`. From this folder (`agent1_predictor`), with the virtual environment from Step 1 active:
+```powershell
+pip install -r requirements.txt   # includes pytest
+python3 -m pytest -q              # all tests should pass
+python3 test_pipeline_smoke.py    # optional end-to-end smoke test
+```
+Run them from this folder, since the tests import modules relative to their own location.
+
+---
+
 ## 📡 Live Streaming Mode (Phase 5)
 
 If you want to observe the AI analyzing a stock in real-time as ticks hit the exchange:

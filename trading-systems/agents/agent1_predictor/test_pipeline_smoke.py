@@ -115,6 +115,21 @@ def test_guardian_rejects_bad_risk_reward():
     assert alloc > 0, "approved trade came back with zero allocation"
 
 
+def test_guardian_rejects_stop_on_wrong_side_of_entry():
+    """abs(entry - stop) hides direction — a BUY stop above entry is not a stop-loss."""
+    from guardian import run_guardian_checks
+
+    common = dict(confidence=0.90, atr_percentile=0.5, allocation=2.0,
+                  entry_price=100.0, atr_val=1.0)
+    status, reason, _ = run_guardian_checks(
+        action="BUY", stop_loss=105.0, target=120.0, **common)
+    assert status == "REJECTED", f"BUY with stop above entry gave {status}: {reason}"
+
+    status, reason, _ = run_guardian_checks(
+        action="SELL", stop_loss=95.0, target=80.0, **common)
+    assert status == "REJECTED", f"SELL with stop below entry gave {status}: {reason}"
+
+
 def test_guardian_rejects_unusable_targets():
     """abs(target - entry) is blind to NaN and to backwards targets — screen them first."""
     from guardian import run_guardian_checks

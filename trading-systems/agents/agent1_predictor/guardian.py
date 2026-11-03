@@ -198,6 +198,17 @@ def run_guardian_checks(action, confidence, atr_percentile, allocation,
         logger.warning(f"[Guardian] {reason}")
         return "REJECTED", reason, 0.0
 
+    # Rules 2 and 4 measure risk as abs(entry - stop), so the stop's side is
+    # never checked there. A BUY stop must sit below entry, a SELL stop above.
+    if action == "BUY" and stop_loss >= entry_price:
+        reason = f"REJECTED: BUY stop-loss {stop_loss:.2f} is not below entry {entry_price:.2f}."
+        logger.warning(f"[Guardian] {reason}")
+        return "REJECTED", reason, 0.0
+    if action == "SELL" and stop_loss <= entry_price:
+        reason = f"REJECTED: SELL stop-loss {stop_loss:.2f} is not above entry {entry_price:.2f}."
+        logger.warning(f"[Guardian] {reason}")
+        return "REJECTED", reason, 0.0
+
     # Use real ATR if provided, otherwise fall back to rough estimate
     # Real ATR is always preferred — the estimate can be inaccurate for volatile symbols
     if atr_val is not None and atr_val > 0:
